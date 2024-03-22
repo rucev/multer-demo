@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const multer = require('multer');
 const upload = multer({ dest: 'uploads/' });
+const path = require('path');
 
 const cors = require('cors');
 router.use(cors());
@@ -43,9 +44,6 @@ router.get('/download/:id', async (req, res) => {
             return res.status(404).json({ message: 'Image not found' });
         }
 
-        const oldPath = `./uploads/${file._id.toString()}`
-        const newPath = `./downloads/${originalName}`
-
         let contentType;
         switch (image.originalname.split('.').pop().toLowerCase()) {
             case 'png':
@@ -60,8 +58,11 @@ router.get('/download/:id', async (req, res) => {
         }
 
         res.setHeader('Content-Type', contentType);
+        res.setHeader('Content-Disposition', `attachment; filename="${image.originalname}"`);
 
-        res.download(image.path, image.originalname);
+        const absolutePath = path.resolve(`./uploads/${image.filename}`);
+
+        res.sendFile(absolutePath);
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Server Error' });

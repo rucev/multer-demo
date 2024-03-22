@@ -20,17 +20,17 @@ const ImageList = ({ forceRefresh, setForceRefresh }) => {
         };
 
         fetchImages();
-        console.log(images)
     }, [forceRefresh]);
 
     const handleDownload = async (imageId, imageName) => {
         try {
-            const response = await fetch(`/images/download/${imageId}`);
+            const response = await fetch(`http://localhost:3000/images/download/${imageId}`);
             if (!response.ok) {
                 throw new Error('Failed to download image');
             }
 
-            const blob = await response.blob();
+            const arrayBuffer = await response.arrayBuffer();
+            const blob = new Blob([arrayBuffer]);
             const url = window.URL.createObjectURL(blob);
 
             const anchor = document.createElement('a');
